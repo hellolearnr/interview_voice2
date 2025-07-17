@@ -3,10 +3,19 @@ import React, { useEffect,useState } from 'react'
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/Services/SupabaseClient';
+import {v4 as uuidv4} from 'uuid';
+import QuestionListContainer from './QuestionListContainer';
+import { useUser } from '@/app/Provider';
+
+
+
 
 function QuestionList({formData}) {
+    const {user} = useUser();
     const [loading, setLoading] = useState(true);
-    const [questions, setQuestions] = useState([]);
+    const [questionList, setQuestions] = useState([]);
     
     useEffect(() => {
         if(formData) {
@@ -21,27 +30,65 @@ function QuestionList({formData}) {
                 ...formData
             });
             
-            console.log(result.data);
+            console.log("API Response:", result.data);
             
             // Handle the response based on the new structure
             if (result.data.content) {
-                // Try to parse JSON if it's a JSON string
-                try {
-                    const parsedQuestions = JSON.parse(result.data.content);
-                    setQuestions(parsedQuestions.interviewQuestions || []);
-                } catch (parseError) {
-                    // If not JSON, treat as plain text
-                    setQuestions([{ question: result.data.content, type: 'Generated' }]);
+                // Check if content is already an object (parsed JSON)
+                if (typeof result.data.content === 'object' && result.data.content.interviewQuestions) {
+                    setQuestions(result.data.content.interviewQuestions);
+                } else if (typeof result.data.content === 'string') {
+                    // Try to parse JSON if it's a string
+                    try {
+                        const parsedQuestions = JSON.parse(result.data.content);
+                        setQuestions(parsedQuestions.interviewQuestions || []);
+                    } catch (parseError) {
+                        console.log("Not JSON format, treating as plain text");
+                        setQuestions([{ question: result.data.content, type: 'Generated' }]);
+                    }
+                } else if (result.data.content.rawText) {
+                    // Handle raw text fallback
+                    setQuestions([{ question: result.data.content.rawText, type: 'Generated' }]);
                 }
             }
             
             setLoading(false);
         } catch(e) {
-            console.error('Error:', e);
-            toast('Failed to generate questions');
+            console.error('Full error object:', e);
+            console.error('Error response:', e.response?.data);
+            console.error('Error status:', e.response?.status);
+            
+            // Show more detailed error message
+            const errorMessage = e.response?.data?.details || e.response?.data?.error || 'Failed to generate questions';
+            toast(errorMessage);
             setLoading(false);
         }
+        
     }
+    const onFinish=async()=>{
+          const interview_id=uuidv4();
+          
+const { data, error } = await supabase
+  .from('all_interviews')
+  .insert([
+    {
+    ...formData,
+    questionList:questionList,
+    email:user?.email,
+    interview_id:interview_id
+    }
+  ])
+  .select()
+
+  if(error) {
+    console.error("Error inserting data:", error);
+    toast("Error saving interview details");
+    return;
+  }
+  console.log("Data inserted successfully:", data);
+  toast("Interview details saved successfully");
+          
+        }
 
     return (
         <div>
@@ -55,17 +102,14 @@ function QuestionList({formData}) {
                 </div>
             )}
             
-            {!loading && questions.length > 0 && (
+            {!loading && questionList.length > 0 && (
                 <div className='mt-5'>
-                    <h2 className='text-lg font-semibold mb-3'>Generated Questions:</h2>
-                    {questions.map((q, index) => (
-                        <div key={index} className='mb-3 p-3 border rounded-lg'>
-                            <p className='font-medium'>{q.question}</p>
-                            <span className='text-sm text-gray-500'>Type: {q.type}</span>
-                        </div>
-                    ))}
+                    <QuestionListContainer questionList={questionList} />
                 </div>
             )}
+            <div className='flex justify-end mt-5'>
+              <Button onClick={() => onFinish()}>Finish</Button>
+            </div>
         </div>
     )
 }
