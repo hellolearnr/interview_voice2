@@ -1,11 +1,14 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { InterviewDataContext } from '@/context/InterviewDataContext'
 import { supabase } from '@/Services/SupabaseClient'
-import { Clock, Info, Video } from 'lucide-react'
+import { Clock, Info, Loader2Icon, Video } from 'lucide-react'
 import Image from 'next/image'
-import { useParams } from 'next/navigation'
-import React, { use, useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+// import { useRouter } from 'next/router'
+import React, { use, useContext, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 
 
@@ -15,6 +18,10 @@ function Interview() {
     const [interviewData,setInterviewData]=useState();
     const [userName,setUserName]=useState();
     const [loading,setLoading]=useState(false);
+    const {interviewInfo,setInterviewInfo}=useContext(InterviewDataContext);
+    const router=useRouter();
+   
+
     useEffect(() => {
         interview_id && GetInterviewDetails();
     }, [interview_id])
@@ -22,13 +29,13 @@ function Interview() {
     const GetInterviewDetails=async()=>{
         setLoading(true);
         try{
-        let {data:Interviews,error}=await supabase
+        let {data:all_interviews,error}=await supabase
         .from ('all_interviews')
         .select("jobPosition,jobDescription,duration,type")
         .eq('interview_id',interview_id)
-        setInterviewData(Interviews[0]);
+        setInterviewData(all_interviews[0]);
         setLoading(false);
-        if(Interviews?.length==0)
+        if(all_interviews?.length==0)
         {
             toast('incorrect interview link')
             return;
@@ -44,11 +51,15 @@ function Interview() {
     }
 
     const onJoinInterview=async()=>{    
+        setLoading(true);
 let { data: all_interviews, error } = await supabase
   .from('all_interviews')
   .select('*')
   .eq('interview_id', interview_id);
   console.log(all_interviews[0]);
+  setInterviewInfo(all_interviews[0]);
+  router.push('/interview/'+interview_id+'/start')
+  setLoading(false);
     }
   return (
     <div className='px-10 md:px-28 lg:px-48 xl:px-80 mt-2 mb-20'>
@@ -81,7 +92,7 @@ let { data: all_interviews, error } = await supabase
         <Button className={'mt-5 w-full font-bold'}
         disabled={loading||!userName}
         onClick={() =>onJoinInterview()}>
-        <Video />Join Interview</Button>
+        <Video />{loading&&<Loader2Icon className='animate-spin' />}Join Interview</Button>
         
        
 
