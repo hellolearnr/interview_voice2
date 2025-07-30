@@ -1,4 +1,5 @@
 'use client'
+import QuestionList from '@/app/(main)/dashboard/create-interview/_components/QuestionList'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { InterviewDataContext } from '@/context/InterviewDataContext'
@@ -9,6 +10,8 @@ import { useParams, useRouter } from 'next/navigation'
 // import { useRouter } from 'next/router'
 import React, { use, useContext, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import InterviewPageDebug from './_components/InterviewPageDebug'
+import { saveToLocalStorage } from '@/lib/debugUtils'
 
 
 
@@ -52,17 +55,33 @@ function Interview() {
 
     const onJoinInterview=async()=>{    
         setLoading(true);
-let { data: all_interviews, error } = await supabase
-  .from('all_interviews')
-  .select('*')
-  .eq('interview_id', interview_id);
-  console.log(all_interviews[0]);
-  setInterviewInfo(all_interviews[0]);
-  router.push('/interview/'+interview_id+'/start')
-  setLoading(false);
+        let { data: all_interviews, error } = await supabase
+        .from('all_interviews')
+        .select('*')
+        .eq('interview_id', interview_id);
+        
+        if (error) {
+            console.error('Error fetching interview:', error);
+            toast('Error fetching interview details');
+            setLoading(false);
+            return;
+        }
+        
+        console.log(all_interviews[0]);
+        const interviewInfoData = {
+            userName: userName,
+            interviewData: all_interviews[0]
+        };
+        
+        // Save to localStorage before navigating
+        saveToLocalStorage('interviewInfo', interviewInfoData);
+        setInterviewInfo(interviewInfoData);
+        router.push('/interview/'+interview_id+'/start')
+        setLoading(false);
     }
   return (
     <div className='px-10 md:px-28 lg:px-48 xl:px-80 mt-2 mb-20'>
+      <InterviewPageDebug interviewId={interview_id} userName={userName} interviewInfo={interviewInfo} />
       <div className='flex flex-col justify-center items-center border rounded-lg bg-gray-900 p-7 lg:px-33 xl:px-52'>
         <Image src={'/logo.png'} alt='logo'
         width={200} height={100} className='w-[140px]'/>

@@ -10,6 +10,8 @@ import AuthDebug from './_components/AuthDebug'
 import TestAPIRoute from './_components/TestAPIRoute'
 import ComprehensiveDebug from './_components/ComprehensiveDebug'
 import InterviewCreationDebug from './_components/InterviewCreationDebug'
+import LocalStorageDebug from './_components/LocalStorageDebug'
+import TestLocalStorage from './_components/TestLocalStorage'
 
 function Dashboard () {
   return (
@@ -22,6 +24,8 @@ function Dashboard () {
       <TestAPIRoute />
       <ComprehensiveDebug />
       <InterviewCreationDebug />
+      <LocalStorageDebug />
+      <TestLocalStorage />
       <h2 className="text-2xl font-bold my-3">Dashboard</h2>
       <CreateOptions />
       <LatestInterviewList  />
