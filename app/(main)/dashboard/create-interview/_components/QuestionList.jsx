@@ -10,12 +10,11 @@ import QuestionListContainer from './QuestionListContainer';
 import { useUser } from '@/app/Provider';
 
 
-
-
-function QuestionList({formData}) {
+function QuestionList({formData,onCreateLink}) {
     const {user} = useUser();
     const [loading, setLoading] = useState(true);
     const [questionList, setQuestions] = useState([]);
+    const [saveLoading,setSaveLoading]=useState(false);
     
     useEffect(() => {
         if(formData) {
@@ -26,6 +25,7 @@ function QuestionList({formData}) {
     const GenerateQuestionList = async() => {
         setLoading(true);
         try {
+            console.log("Generating question list with formData:", formData);
             const result = await axios.post('/api/ai-model', {
                 ...formData
             });
@@ -60,34 +60,77 @@ function QuestionList({formData}) {
             
             // Show more detailed error message
             const errorMessage = e.response?.data?.details || e.response?.data?.error || 'Failed to generate questions';
-            toast(errorMessage);
+            toast(`Error: ${errorMessage}`);
             setLoading(false);
         }
         
     }
     const onFinish=async()=>{
+        setSaveLoading(true);
+          console.log("onFinish called, user:", user);
+          console.log("formData:", formData);
+          console.log("questionList:", questionList);
+          
+          if (!user) {
+              console.error("No user found in context");
+              toast("User not authenticated");
+              return;
+          }
+          
+          if (!formData) {
+              console.error("No formData provided");
+              toast("Form data missing");
+              return;
+          }
+          
+          if (!questionList || questionList.length === 0) {
+              console.error("No questions in list");
+              toast("No questions to save");
+              return;
+          }
+          
           const interview_id=uuidv4();
+          console.log("Generated interview_id:", interview_id);
           
-const { data, error } = await supabase
-  .from('all_interviews')
-  .insert([
-    {
-    ...formData,
-    questionList:questionList,
-    email:user?.email,
-    interview_id:interview_id
-    }
-  ])
-  .select()
+          const insertData = {
+              jobPosition: formData?.jobPosition,                 
+              jobDescription: formData?.jobDescription,         
+              duration: formData?.duration,                       
+              type: Array.isArray(formData?.type) ? formData?.type.join(',') : formData?.type,
+              questionList: questionList,
+              email: user?.email,
+              interview_id: interview_id
+          };
+          
+          console.log("Insert data:", insertData);
+          
+          // First, check if we can read from the table
+          const { data: readData, error: readError } = await supabase
+            .from('all_interviews')
+            .select('count()', { count: 'exact' });
+          
+          console.log("Read test result:", { readData, readError });
+          
+          // Try the insert operation
+          const { data, error } = await supabase
+            .from('all_interviews')
+            .insert([insertData])
+            .select();
 
-  if(error) {
-    console.error("Error inserting data:", error);
-    toast("Error saving interview details");
-    return;
-  }
-  console.log("Data inserted successfully:", data);
-  toast("Interview details saved successfully");
-          
+          if(error) {
+            console.error("Error inserting data:", error);
+            console.error("Error details:", error.details);
+            console.error("Error hint:", error.hint);
+            toast(`Error saving interview details: ${error.message}`);
+            return;
+          }
+          setSaveLoading(false);
+          onCreateLink(
+            interview_id
+            
+        )
+          console.log("Data inserted successfully:", data);
+          toast("Interview details saved successfully");
         }
 
     return (
@@ -108,7 +151,9 @@ const { data, error } = await supabase
                 </div>
             )}
             <div className='flex justify-end mt-5'>
-              <Button onClick={() => onFinish()}>Finish</Button>
+              <Button onClick={() => onFinish()} disabled={saveLoading}>
+                {saveLoading && <Loader2 className='animate-spin' />}
+                Create Interview Link</Button>
             </div>
         </div>
     )
