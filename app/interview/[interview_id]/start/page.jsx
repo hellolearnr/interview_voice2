@@ -1,19 +1,31 @@
 'use client'
 import { InterviewDataContext } from '@/context/InterviewDataContext';
-import {  Mic, Phone, Timer } from 'lucide-react';
+import {  Loader2Icon, Mic, Phone, Timer } from 'lucide-react';
 import React, { useContext, useEffect, useState } from 'react'
 import Image from 'next/image'
 import InterviewStartDebug from '../_components/InterviewStartDebug';
 import Vapi from '@vapi-ai/web';
 import AlertConfirmation from './_components/AlertConfirmation';
+import { toast } from 'sonner';
+import { supabase } from '@/Services/SupabaseClient';
+import { useParams, useRouter } from 'next/navigation';
+import axios from 'axios';
+
+
+
 
 
 function StartInterview() {
     const {interviewInfo,setInterviewInfo}=useContext(InterviewDataContext);
     console.log(interviewInfo);
     const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_KEY);
-    const {activeUser,setActiveUser}=useState(false);
-    
+    const [activeUser,setActiveUser]=useState(false);
+    const [conversation,setConversation]=useState();
+    const {interview_id}=useParams();
+    const router=useRouter();
+    const [loading,setLoading]=useState(false);
+
+
 
     useEffect(() => {
         interviewInfo&&startCall();
@@ -96,9 +108,48 @@ Ensure the interview remains focused on React`
     }, [interviewInfo, setInterviewInfo]);
 
     const stopInterview=() => {
-        vapi.stop()
+        vapi.stop();
+        console.log('STOP...')
+        // setCallEnd(true); //will add this later
+        generateFeedback();
     }
-    // from vapi docs
+//     // from vapi docs
+// vapi.on('call-start', () => {
+//   console.log('Call has started');
+//   toast('call has started');
+// });
+
+//     vapi.on('speech-start', () => {
+//   console.log('Assistant speech has started');
+//   setActiveUser(false);
+// });
+
+// vapi.on('speech-end', () => {
+//   console.log('Assistant Speech has ended');
+//   setActiveUser(true);
+// });
+// vapi.on('call-end', () => {
+//   console.log('Call has stopped');
+//   toast('call has stopped');
+//   generateFeedback
+// });
+// vapi.on('message', (message) => {
+//   console.log(message?.conversation);
+//   setConversation(message?.conversation);
+// });
+
+useEffect(() => {
+  const handleMessage = (message) => {
+    console.log('Message:', message);
+    if (message?.conversation) {
+      // Store the conversation directly as an array
+      setConversation(message.conversation);
+    }
+  };
+
+  vapi.on("message", handleMessage);
+
+ // from vapi docs
 vapi.on('call-start', () => {
   console.log('Call has started');
   toast('call has started');
@@ -116,7 +167,82 @@ vapi.on('speech-end', () => {
 vapi.on('call-end', () => {
   console.log('Call has stopped');
   toast('call has stopped');
+  generateFeedback();
 });
+
+  // Clean up the listener
+  return () => {
+    vapi.off("message", handleMessage);
+    vapi.off('call-start', () => console.log('Call has started -END'));
+    vapi.off('speech-start', () => console.log('Assistant speech has started-END'));
+    vapi.off('speech-end', () => console.log('Assistant Speech has ended-END'));
+    vapi.off('call-end', () => console.log('Call has stopped-END'));
+  };
+}, []);
+
+const generateFeedback=async()=>{
+  console.log("Generating feedback with conversation:", conversation);
+  
+  // Check if conversation is valid
+  if (!conversation || conversation.length === 0) {
+    console.error("No conversation data found");
+    toast("No conversation data to generate feedback from");
+    router.replace('/interview/'+interview_id+'/completed');
+    return;
+  }
+  
+  // Send the conversation array directly
+  const result=await axios.post('/api/ai-feedback',{
+    conversation: conversation
+  });
+  
+  console.log(result?.data);
+  const content=result.data.content;
+  
+  // Handle both possible response formats from the API
+  let FINAL_CONTENT;
+  if (typeof content === 'string') {
+    // If content is already a string, process it as before
+    FINAL_CONTENT = content.replace('```json\n','').replace('```','');
+  } else if (content.rawText) {
+    // If content has rawText property, use that
+    FINAL_CONTENT = content.rawText.replace('```json\n','').replace('```','');
+  } else {
+    // If content is a parsed JSON object, stringify it
+    FINAL_CONTENT = JSON.stringify(content);
+  }
+  
+  console.log("FINAL_CONTENT:", FINAL_CONTENT);
+  
+  // Parse the final content for database insertion
+  let feedbackData;
+  try {
+    feedbackData = JSON.parse(FINAL_CONTENT);
+  } catch (parseError) {
+    // If parsing fails, store as is
+    console.error("Failed to parse feedback data:", parseError);
+    feedbackData = { rawFeedback: FINAL_CONTENT };
+  }
+
+  //save to supabase
+  const { data, error } = await supabase
+    .from('interview-feedback')
+    .insert([
+      { userName: interviewInfo?.userName,
+      userEmail: interviewInfo?.userEmail,
+       interview_id: interview_id,
+       feedback: feedbackData,
+       recommended: false
+      },
+    ])
+    .select()
+    console.log(data);
+    console.log(error);
+
+    router.replace('/interview/'+interview_id+'/completed');
+    setLoading(false);
+
+}
 
     return (
         <div className='p-20 lg:px-48 xl:px-56 '>
@@ -152,9 +278,11 @@ vapi.on('call-end', () => {
             </div>
             <div className='flex items-center gap-5 justify-center mt-7'>
         <Mic className='h-10 w-10 p-3 bg-gray-500 text-white rounded-full cursor-pointer' />
-        <AlertConfirmation stopInterview={()=>stopInterview()}> 
-        <Phone className='h-12 w-12 p-3 bg-red-500 text-white rounded-full cursor-pointer' />
-        </AlertConfirmation>
+        {/* <AlertConfirmation stopInterview={()=>stopInterview()}>  */}
+        {!loading?<Phone className='h-12 w-12 p-3 bg-red-500 text-white rounded-full cursor-pointer'
+        onClick={()=>stopInterview()} 
+        />: <Loader2Icon className='animate-spin'/>}
+        {/* </AlertConfirmation> */}
        
         
       </div>

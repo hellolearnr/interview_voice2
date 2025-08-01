@@ -20,9 +20,11 @@ function Interview() {
     console.log(interview_id);
     const [interviewData,setInterviewData]=useState();
     const [userName,setUserName]=useState();
+    const [userEmail,setUserEmail]=useState();
     const [loading,setLoading]=useState(false);
     const {interviewInfo,setInterviewInfo}=useContext(InterviewDataContext);
     const router=useRouter();
+    
    
 
     useEffect(() => {
@@ -70,6 +72,7 @@ function Interview() {
         console.log(all_interviews[0]);
         const interviewInfoData = {
             userName: userName,
+            userEmail: userEmail,
             interviewData: all_interviews[0]
         };
         
@@ -97,8 +100,8 @@ function Interview() {
            <Input placeholder='e.g Raj kumar' onChange={(event)=> setUserName(event.target.value)}/>
         </div>
         <div className='w-full'>
-           <h2> Enter your full name</h2>
-           <Input placeholder='e.g Raj kumar' onChange={(event)=> setUserName(event.target.value)}/>
+           <h2> Enter your Email id</h2>
+           <Input placeholder='e.g Rajkumar@gmail.com' onChange={(event)=> setUserEmail(event.target.value)}/>
         </div>
 
         <div className='p-3 bg-blue-100 flex gap-4 rounded-xl mt-5 '>

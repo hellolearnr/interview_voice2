@@ -72,3 +72,34 @@ format: interviewQuestions=[
 ...
 }]
 🎯 The goal is to create a structured, relevant, and time-optimized interview plan for a {{jobTitle}} role.`
+
+export const FEEDBACK_PROMPT = `Here is a conversation between an AI interviewer and a candidate:
+
+{{conversation}}
+
+Based on this conversation, please provide detailed feedback on the candidate's interview performance. 
+Give me ratings out of 10 for the following areas:
+1. Technical Skills
+2. Communication
+3. Problem Solving
+4. Experience
+
+Also provide:
+- A summary of the interview in 3 lines
+- A clear recommendation on whether to hire this candidate or not
+- A one-line recommendation message
+
+Please format your response as valid JSON with this exact structure:
+{
+  "feedback": {
+    "rating": {
+      "technicalSkills": 0,
+      "communication": 0,
+      "problemSolving": 0,
+      "experience": 0
+    },
+    "summary": "",
+    "recommendation": "Yes/No",
+    "recommendationMsg": ""
+  }
+}` 
