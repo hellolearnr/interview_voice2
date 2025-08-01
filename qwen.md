@@ -2,8 +2,8 @@
 
 **Live Demo**: https://airecruiter-app.vercel.app  
 **Stack**: Next.js + React + Vapi + Supabase + AI
-##important instruction
-do not change the main codebase. all i want is to debug where and why it is not working as expected. so add debug test cases to add to the code.
+### important instruction:
+1)do not change the main codebase. all i want is to debug where and why it is not working as expected. so add debug test cases to add to the code.
 ## Quick Debug Setup (Non-invasive)
 
 ### 1. Environment Check

@@ -95,7 +95,12 @@ function Interview() {
         <div className='w-full'>
            <h2> Enter your full name</h2>
            <Input placeholder='e.g Raj kumar' onChange={(event)=> setUserName(event.target.value)}/>
-            </div>
+        </div>
+        <div className='w-full'>
+           <h2> Enter your full name</h2>
+           <Input placeholder='e.g Raj kumar' onChange={(event)=> setUserName(event.target.value)}/>
+        </div>
+
         <div className='p-3 bg-blue-100 flex gap-4 rounded-xl mt-5 '>
             <Info className='text-primary'/>
         <div>    
