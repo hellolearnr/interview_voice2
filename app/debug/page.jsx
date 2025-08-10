@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import AudioDebug from '@/app/debug-audio';
 import VapiClientDebug from '@/app/vapi-client-debug';
+import UserDebugInfo from '@/app/(main)/dashboard/_components/UserDebugInfo';
+import DatabaseDebug from '@/app/(main)/dashboard/_components/DatabaseDebug';
+import TestDatabaseInsertion from '@/app/(main)/dashboard/_components/TestDatabaseInsertion';
+import AuthDebug from '@/app/(main)/dashboard/_components/AuthDebug';
+import TestAPIRoute from '@/app/(main)/dashboard/_components/TestAPIRoute';
+import ComprehensiveDebug from '@/app/(main)/dashboard/_components/ComprehensiveDebug';
+import InterviewCreationDebug from '@/app/(main)/dashboard/_components/InterviewCreationDebug';
+import LocalStorageDebug from '@/app/(main)/dashboard/_components/LocalStorageDebug';
+import TestLocalStorage from '@/app/(main)/dashboard/_components/TestLocalStorage';
 
 export default function DebugPage() {
   const [debugInfo, setDebugInfo] = useState({});
@@ -35,8 +44,8 @@ export default function DebugPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6">VAPI Audio Debug Dashboard</h1>
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-3xl font-bold mb-6">Comprehensive Debug Dashboard</h1>
         
         {loading ? (
           <div className="text-center py-8">Loading debug information...</div>
@@ -74,12 +83,40 @@ export default function DebugPage() {
           </div>
         )}
         
-        <div className="mt-8 text-sm text-gray-600">
-          <p>Additional debug components are displayed in the corners of the screen:</p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Audio Debug - Bottom right corner</li>
-            <li>VAPI Debug - Bottom left corner</li>
-          </ul>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">User & Authentication Debug</h2>
+          <UserDebugInfo />
+          <AuthDebug />
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Database Debug</h2>
+          <DatabaseDebug />
+          <TestDatabaseInsertion />
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">API & Storage Debug</h2>
+          <TestAPIRoute />
+          <LocalStorageDebug />
+          <TestLocalStorage />
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Comprehensive & Interview Debug</h2>
+          <ComprehensiveDebug />
+          <InterviewCreationDebug />
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Audio Debug Components</h2>
+          <div className="mt-8 text-sm text-gray-600">
+            <p>Additional debug components are displayed in the corners of the screen:</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>Audio Debug - Bottom right corner</li>
+              <li>VAPI Debug - Bottom left corner</li>
+            </ul>
+          </div>
         </div>
       </div>
       

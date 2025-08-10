@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "cipher": {
+      "command": "cipher",
+      "args": [
+        "--mode", "mcp",
+        "--agent", "/Users/reddy/all/Anvesh/Tech/practice/courses/cipher.yml"
+      ],
+      "env": {
+        "MCP_SERVER_MODE": "default",
+        "OPENAI_API_KEY": "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",
+        "VECTOR_STORE_TYPE": "milvus",
+        "VECTOR_STORE_URL": "https://in03-deb10fc5eaec93d.serverless.aws-eu-central-1.cloud.zilliz.com",
+        "VECTOR_STORE_API_KEY": "489f35fd8a4da95eafd0c32117956f36fad172778feab52836b0975cc48d0371c6314b01418a558fba69fc17c92ff8df56eabfcc",
+        "VECTOR_STORE_USERNAME": "db_deb10fc5eaec93d",
+        "VECTOR_STORE_PASSWORD": "Bt4)QV];Fy&PPgw,",
+        "VECTOR_STORE_COLLECTION": "knowledge_memory",
+        "REFLECTION_VECTOR_STORE_COLLECTION": "reflection_memory",
+        "DISABLE_REFLECTION_MEMORY": "false"
+      }
+    }
+  }
+}

@@ -2,33 +2,24 @@
 import React from 'react'
 import WelcomeContainer from './_components/WelcomeContainer'
 import CreateOptions from './_components/CreateOptions'
-import LatestInterviewList from './_components/LatestInterviewsList'
-import UserDebugInfo from './_components/UserDebugInfo'
-import DatabaseDebug from './_components/DatabaseDebug'
-import TestDatabaseInsertion from './_components/TestDatabaseInsertion'
-import AuthDebug from './_components/AuthDebug'
-import TestAPIRoute from './_components/TestAPIRoute'
-import ComprehensiveDebug from './_components/ComprehensiveDebug'
-import InterviewCreationDebug from './_components/InterviewCreationDebug'
-import LocalStorageDebug from './_components/LocalStorageDebug'
-import TestLocalStorage from './_components/TestLocalStorage'
+import LatestInterviewsList from './_components/LatestInterviewsList'
 
 function Dashboard () {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
   return (
     <div>
       {/* <WelcomeContainer /> */}
-      <UserDebugInfo />
-      <DatabaseDebug />
-      <TestDatabaseInsertion />
-      <AuthDebug />
-      <TestAPIRoute />
-      <ComprehensiveDebug />
-      <InterviewCreationDebug />
-      <LocalStorageDebug />
-      <TestLocalStorage />
       <h2 className="text-2xl font-bold my-3">Dashboard</h2>
+      {isDevelopment && (
+        <div className="mb-4">
+          <a href="/debug" className="text-blue-500 hover:text-blue-700 text-sm underline">
+            Debug Information (Development Only)
+          </a>
+        </div>
+      )}
       <CreateOptions />
-      <LatestInterviewList  />
+      <LatestInterviewsList  />
     </div>
   )
 }
