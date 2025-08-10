@@ -1,6 +1,6 @@
 import React from 'react'
 import  DashboardProvider from './DashboardProvider'
-import { AppSidebar } from './_components/AppSidebar'
+// import { AppSidebar } from './_components/AppSidebar'
 import { Toaster } from 'sonner'
 
 function DashboardLayout ({children}){

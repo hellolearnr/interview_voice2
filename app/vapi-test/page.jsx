@@ -1,3 +1,4 @@
+"use client";
 // Test page for Vapi KrispSDK fix
 import React, { useState } from 'react';
 import Vapi from '@vapi-ai/web';

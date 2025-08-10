@@ -4,8 +4,14 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/Services/SupabaseClient';
 
+interface DebugInfo {
+  oauthData: any;  // you can replace `any` with the exact type if needed
+  oauthError: any;
+}
+
+
 function Login () {
-  const [debugInfo, setDebugInfo] = useState(null);
+  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   
   const signInWithGoogle = async() => {
     console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);

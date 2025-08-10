@@ -1,4 +1,4 @@
-export async function GET(request) {
+export async function GET() {
   const debugInfo = {
     timestamp: new Date().toISOString(),
     message: "Interview debug endpoint",
