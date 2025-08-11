@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { Copy, Send } from 'lucide-react'
+import { ArrowRight, Copy, Send } from 'lucide-react'
 import moment from 'moment/moment'
 import React from 'react'
 import { toast } from 'sonner'
 
-function InterviewCard ({interview}) {
+function InterviewCard ({interview,viewDetail=false}) {
     const url = process.env.NEXT_PUBLIC_HOST_URL + '/' + interview?.interview_id
 
     const copyLink = () => {
@@ -24,9 +24,11 @@ function InterviewCard ({interview}) {
             </div>
             <div className='flex-1'>
                 <h2 className='mt-3 font-bold text-lg'>{interview?.jobPosition}</h2>
-                <h2 className='mt-2'>{interview?.duration} min</h2>
+                <h2 className='flex justify-between mt-2 text-gray-400'>{interview?.duration} min</h2>
+                <span className='text-green-500'> {interview['interview-feedback']?.length} candidates</span>
             </div>
-            <div className='flex gap-3 mt-5'>
+          {!viewDetail?
+             <div className='flex gap-3 mt-5'>
                 <Button 
                     variant='outline' 
                     className='flex-1 min-w-0' 
@@ -43,6 +45,9 @@ function InterviewCard ({interview}) {
                     <span className='truncate'>Send</span>
                 </Button>
             </div>
+            :
+            
+                <Button>View detail<ArrowRight className='w-4 h-4 ml-2 flex-shrink-0' /></Button>}
         </div>
     )
 }
