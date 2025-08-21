@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button'
 import moment from 'moment'
 import React from 'react'
+import CandidateFeedbackDialog from './CandidateFeedbackDialog' // Adjust the import based on your project structure
+
 
 
 
@@ -20,7 +22,7 @@ function CandidatList({candidateList}) {
           </div>
           <div className='flex items-center gap-3'>
             <h2 className='text-green-600 flex gap-3 item-center font-bold'>6/10</h2>
-          <Button variant={'outline'} className='text-primary'>view report</Button>
+            <CandidateFeedbackDialog candidate={candidate} />
           </div>
         </div>
   ))}
