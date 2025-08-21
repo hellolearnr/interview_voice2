@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { supabase } from '@/Services/SupabaseClient'; // Adjust the import based on your project structure
 import { useUser } from '@/app/Provider'; // Assuming you have a custom hook for user context
 import InterviewDetailContainer from './_components/InterviewDetailContainer';
+import CandidatList from './_components/CandidatList'; // Adjust the import based on your project structure
 
 
 function InterviewDetail() {
@@ -30,6 +31,7 @@ function InterviewDetail() {
     <div className='mt-5'>
       <h2 className='text-2xl font-bold'>Interview Details</h2>
       <InterviewDetailContainer interviewDetail={interviewDetail} />
+      <CandidatList candidateList={interviewDetail?.['interview-feedback'] || []} />
     </div>
   )
 }
