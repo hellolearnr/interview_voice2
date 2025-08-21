@@ -3,6 +3,7 @@ import { ArrowRight, Copy, Send } from 'lucide-react'
 import moment from 'moment/moment'
 import React from 'react'
 import { toast } from 'sonner'
+import Link from 'next/link'
 
 function InterviewCard ({interview,viewDetail=false}) {
     const url = process.env.NEXT_PUBLIC_HOST_URL + '/' + interview?.interview_id
@@ -46,8 +47,10 @@ function InterviewCard ({interview,viewDetail=false}) {
                 </Button>
             </div>
             :
-            
-                <Button>View detail<ArrowRight className='w-4 h-4 ml-2 flex-shrink-0' /></Button>}
+                <Link href={"/scheduled-interviews/"+interview?.interview_id+"/details"}>
+                <Button>View detail<ArrowRight className='w-4 h-4 ml-2 flex-shrink-0' /></Button>
+                </Link>
+                }
         </div>
     )
 }
